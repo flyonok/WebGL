@@ -621,6 +621,8 @@ function normalize( u, excludeLastComponent )
 
 function mix( u, v, s )
 {
+    // 扰动参数，控制山脉的不规则性
+    const perturbation = 0.1
     if ( typeof s !== "number" ) {
         throw "mix: the last paramter " + s + " must be a number";
     }
@@ -631,7 +633,9 @@ function mix( u, v, s )
 
     var result = [];
     for ( var i = 0; i < u.length; ++i ) {
-        result.push( (1.0 - s) * u[i] + s * v[i] );
+        let value = (1.0 - s) * u[i] + s * v[i] + Math.random() * (2*perturbation) + (-perturbation);
+        // result.push( (1.0 - s) * u[i] + s * v[i] );
+        result.push(value);
     }
 
     return result;

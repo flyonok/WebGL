@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Turtle Graphics with WebGL</title>
+</head>
+<body>
+    <canvas id="canvas" width="800" height="600"></canvas>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const gl = canvas.getContext('webgl');
+
+        if (!gl) {
+            console.error('WebGL not supported');
+        }
+
+        const vertexShaderSource = `
+            attribute vec2 position;
+            void main() {
+                gl_PointSize = 10.0;
+                gl_Position = vec4(position, 0.0, 1.0);
+            }
+        `;
+
+        const fragmentShaderSource = `
+            void main() {
+                gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+            }
+        `;
+
+        const vertexShader = gl.createShader(gl.VERTEX_SHADER);
+        gl.shaderSource(vertexShader, vertexShaderSource);
+        gl.compileShader(vertexShader);
+
+        const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+        gl.shaderSource(fragmentShader, fragmentShaderSource);
+        gl.compileShader(fragmentShader);
+
+        const shaderProgram = gl.createProgram();
+        gl.attachShader(shaderProgram, vertexShader);
+        gl.attachShader(shaderProgram, fragmentShader);
+        gl.linkProgram(shaderProgram);
+        gl.useProgram(shaderProgram);
+
+        const positionLocation = gl.getAttribLocation(shaderProgram, 'position');
+        gl.enableVertexAttribArray(positionLocation);
+
+        const vertices = new Float32Array([0.0, 0.0]);
+        const vertexBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+        gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+
+        gl.clearColor(0.0, 0.0, 0.0, 1.0);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        gl.drawArrays(gl.POINTS, 0, 1);
+        // gl.clearBuffer(vertexBuffer);
+
+        // 海龟图形系统函数
+        let turtleX = canvas.width / 2;
+        let turtleY = canvas.height / 2;
+        let turtleAngle = 30;
+
+        function forward(distance) {
+            const radians = (turtleAngle * Math.PI) / 180;
+            const dx = Math.cos(radians) * distance;
+            const dy = Math.sin(radians) * distance;
+
+            const newX = turtleX + dx;
+            const newY = turtleY + dy;
+
+            // 绘制线段
+            // const vertexBuffer = gl.createBuffer();
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([turtleX, turtleY, newX, newY]), gl.STATIC_DRAW);
+            gl.vertexAttribPointer(positionLocation, 4, gl.FLOAT, false, 0, 0);
+            // gl.clearColor(0.0, 0.0, 0.0, 1.0);
+            // gl.clear(gl.COLOR_BUFFER_BIT);
+            gl.drawArrays(gl.LINES, 0, 2);
+            // gl.clearBuffer(vertexBuffer);
+
+            turtleX = newX;
+            turtleY = newY;
+        }
+
+        // 示例用法
+        forward(50);   // 前进 50 个单位
+        forward(50);
+    </script>
+</body>
+</html>
