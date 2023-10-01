@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4x4 Grid of Adjacent Squares with Lines in WebGL</title>
+</head>
+<body>
+    <canvas id="canvas" width="800" height="600"></canvas>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const gl = canvas.getContext('webgl');
+
+        if (!gl) {
+            console.error('WebGL not supported');
+        }
+
+        const vertexShaderSource = `
+            attribute vec2 position;
+            void main() {
+                gl_PointSize = 1.0;
+                gl_Position = vec4(position, 0.0, 1.0);
+            }
+        `;
+
+        const fragmentShaderSource = `
+            void main() {
+                gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0); // 白色
+            }
+        `;
+
+        const vertexShader = gl.createShader(gl.VERTEX_SHADER);
+        gl.shaderSource(vertexShader, vertexShaderSource);
+        gl.compileShader(vertexShader);
+
+        const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+        gl.shaderSource(fragmentShader, fragmentShaderSource);
+        gl.compileShader(fragmentShader);
+
+        const shaderProgram = gl.createProgram();
+        gl.attachShader(shaderProgram, vertexShader);
+        gl.attachShader(shaderProgram, fragmentShader);
+        gl.linkProgram(shaderProgram);
+        gl.useProgram(shaderProgram);
+
+        const positionLocation = gl.getAttribLocation(shaderProgram, 'position');
+        gl.enableVertexAttribArray(positionLocation);
+
+        const squareSize = 0.2; // 单个正方形的边长
+        const numRows = 5; // 行数
+        const numCols = 5; // 列数
+
+        gl.clearColor(0.0, 0.0, 0.0, 1.0);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+
+        for (let i = 0; i < numRows; i++) {
+            for (let j = 0; j < numCols; j++) {
+                const x = -1.0 + j * squareSize;
+                const y = 1.0 - i * squareSize;
+
+                // 定义正方形的四个边界线段
+                const verticesOfSquare = [
+                    x, y,
+                    x + squareSize, y,
+                    
+                    x + squareSize, y,
+                    x + squareSize, y - squareSize,
+                    
+                    x + squareSize, y - squareSize,
+                    x, y - squareSize,
+                    
+                    x, y - squareSize,
+                    x, y,
+                ];
+
+                const vertexBuffer = gl.createBuffer();
+                gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(verticesOfSquare), gl.STATIC_DRAW);
+                gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+
+                gl.drawArrays(gl.LINES, 0, verticesOfSquare.length / 2);
+            }
+        }
+    </script>
+</body>
+</html>

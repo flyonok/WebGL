@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Koch Snowflake with WebGL</title>
+</head>
+<body>
+    <canvas id="canvas" width="800" height="600"></canvas>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const gl = canvas.getContext('webgl');
+
+        if (!gl) {
+            console.error('WebGL not supported');
+        }
+
+        const vertexShaderSource = `
+            attribute vec2 position;
+            void main() {
+                gl_PointSize = 1.0;
+                gl_Position = vec4(position, 0.0, 1.0);
+            }
+        `;
+
+        const fragmentShaderSource = `
+            void main() {
+                gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0); // 白色
+            }
+        `;
+
+        const vertexShader = gl.createShader(gl.VERTEX_SHADER);
+        gl.shaderSource(vertexShader, vertexShaderSource);
+        gl.compileShader(vertexShader);
+
+        const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+        gl.shaderSource(fragmentShader, fragmentShaderSource);
+        gl.compileShader(fragmentShader);
+
+        const shaderProgram = gl.createProgram();
+        gl.attachShader(shaderProgram, vertexShader);
+        gl.attachShader(shaderProgram, fragmentShader);
+        gl.linkProgram(shaderProgram);
+        gl.useProgram(shaderProgram);
+
+        const positionLocation = gl.getAttribLocation(shaderProgram, 'position');
+        gl.enableVertexAttribArray(positionLocation);
+
+        const vertices = [];
+
+        // 递归生成 Koch 雪花的线段
+        function generateKochSnowflake(x1, y1, x2, y2, depth) {
+            if (depth === 0) {
+                vertices.push(x1, y1, x2, y2);
+            } else {
+                // 计算 Koch 雪花中间点和顶点
+                const deltaX = (x2 - x1) / 3;
+                const deltaY = (y2 - y1) / 3;
+                const x3 = x1 + deltaX;
+                const y3 = y1 + deltaY;
+                const x4 = x3 + (deltaX * Math.cos(Math.PI / 3)) - (deltaY * Math.sin(Math.PI / 3));
+                const y4 = y3 + (deltaX * Math.sin(Math.PI / 3)) + (deltaY * Math.cos(Math.PI / 3));
+                const x5 = x1 + 2 * deltaX;
+                const y5 = y1 + 2 * deltaY;
+
+                // 递归生成 Koch 雪花的四段线段
+                generateKochSnowflake(x1, y1, x3, y3, depth - 1);
+                generateKochSnowflake(x3, y3, x4, y4, depth - 1);
+                generateKochSnowflake(x4, y4, x5, y5, depth - 1);
+                generateKochSnowflake(x5, y5, x2, y2, depth - 1);
+            }
+        }
+
+        // 生成 Koch 雪花的初始线段
+        const initialX1 = -1;
+        const initialY1 = 1.0;
+        const initialX2 = 0;
+        const initialY2 = -1;
+        generateKochSnowflake(initialX1, initialY1, initialX2, initialY2, 2);
+
+        const vertexBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+        gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+
+        gl.clearColor(0.0, 0.0, 0.0, 1.0);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        gl.drawArrays(gl.LINES, 0, vertices.length / 2);
+    </script>
+</body>
+</html>
