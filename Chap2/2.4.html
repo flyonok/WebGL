@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Turtle Graphics with WebGL</title>
+    <script type="text/javascript" src="../Common/MV.js"></script>
 </head>
+
 <body>
     <canvas id="canvas" width="800" height="600"></canvas>
 
@@ -17,10 +20,10 @@
         }
 
         const vertexShaderSource = `
-            attribute vec2 position;
+            attribute vec4 position;
             void main() {
-                gl_PointSize = 10.0;
-                gl_Position = vec4(position, 0.0, 1.0);
+                gl_PointSize = 5.0;
+                gl_Position = position;
             }
         `;
 
@@ -44,49 +47,104 @@
         gl.linkProgram(shaderProgram);
         gl.useProgram(shaderProgram);
 
-        const positionLocation = gl.getAttribLocation(shaderProgram, 'position');
-        gl.enableVertexAttribArray(positionLocation);
+        var positionLocation = gl.getAttribLocation(shaderProgram, 'position');
+        
+        // const vertices = new Float32Array([0.0, 0.0]);
+        
 
-        const vertices = new Float32Array([0.0, 0.0]);
-        const vertexBuffer = gl.createBuffer();
+        // 海龟图形系统函数
+        // let turtleX = canvas.width / 1000;
+        // let turtleY = canvas.height / 1000;
+        let turtleX = 0;
+        let turtleY = 0;
+        let turtleAngle = 0;
+        gl.viewport(turtleX, turtleY, canvas.width, canvas.height);
+        const vertices = vec2(turtleX, turtleY);
+        var points = [vertices]
+        var vertexBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, flatten(points), gl.STATIC_DRAW);
         gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
-
+        gl.enableVertexAttribArray(positionLocation);
+        
         gl.clearColor(0.0, 0.0, 0.0, 1.0);
         gl.clear(gl.COLOR_BUFFER_BIT);
         gl.drawArrays(gl.POINTS, 0, 1);
         // gl.clearBuffer(vertexBuffer);
-
-        // 海龟图形系统函数
-        let turtleX = canvas.width / 2;
-        let turtleY = canvas.height / 2;
-        let turtleAngle = 30;
+        // gl.deleteBuffer(vertexBuffer);
 
         function forward(distance) {
+            distance = distance / canvas.width;
             const radians = (turtleAngle * Math.PI) / 180;
             const dx = Math.cos(radians) * distance;
             const dy = Math.sin(radians) * distance;
 
             const newX = turtleX + dx;
-            const newY = turtleY + dy;
+            const newY = turtleY - dy;
 
             // 绘制线段
             // const vertexBuffer = gl.createBuffer();
-            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([turtleX, turtleY, newX, newY]), gl.STATIC_DRAW);
-            gl.vertexAttribPointer(positionLocation, 4, gl.FLOAT, false, 0, 0);
+            const vec1 = vec2(turtleX, turtleY);
+            const vec21 = vec2(newX, newY);
+            points = [vec1, vec21];
+            // gl.clearBuffer();
+            positionLocation = gl.getAttribLocation(shaderProgram, 'position');
+            
+            // vertexBuffer = gl.createBuffer();
+            // gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, flatten(points), gl.STATIC_DRAW);
+            gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+            gl.enableVertexAttribArray(positionLocation);
             // gl.clearColor(0.0, 0.0, 0.0, 1.0);
             // gl.clear(gl.COLOR_BUFFER_BIT);
             gl.drawArrays(gl.LINES, 0, 2);
+            // gl.deleteBuffer(vertexBuffer);
             // gl.clearBuffer(vertexBuffer);
 
             turtleX = newX;
             turtleY = newY;
         }
 
+        // 右转
+        function right(angle) {
+            turtleAngle += angle;
+        }
+
+        // 左转
+        function left(angle) {
+            turtleAngle -= angle;
+        }
+
+        // 抬起/放下画笔
+        function pen(upDown) {
+            penDown = upDown;
+        }
+
+        // 分形山脉生成函数
+        function drawMountain(iterations, length) {
+            if (iterations === 0) {
+                forward(length);
+            } else {
+                const newLength = length / 2;
+                drawMountain(iterations - 1, newLength);
+                left(45);
+                drawMountain(iterations - 1, newLength);
+                right(90);
+                drawMountain(iterations - 1, newLength);
+                left(45);
+                drawMountain(iterations - 1, newLength);
+            }
+        }
+        // 开始绘制分形山脉
+        drawMountain(5, canvas.width / 2);
+        // drawMountain(5, -canvas.width / 2);
         // 示例用法
-        forward(50);   // 前进 50 个单位
-        forward(50);
+        // forward(50);   // 前进 50 个单位
+        // right(30);
+        // forward(10);
+        // left(-30);
+        // forward(10);
     </script>
 </body>
+
 </html>
