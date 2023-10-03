@@ -13,43 +13,43 @@
         const gl = canvas.getContext("webgl");
 
         const vertexShaderSource = `
-  // 顶点着色器代码
-  attribute vec2 position;
-  uniform float time;
-  varying vec3 color;
+            // 顶点着色器代码
+            attribute vec2 position;
+            uniform float time;
+            varying vec3 color;
 
-  void main() {
-    // 模拟重力效应
-    float gravity = -0.1;
-    float velocity = 0.0;
-    float elasticity = 0.8;
+            void main() {
+                // 模拟重力效应
+                float gravity = -0.1;
+                float velocity = 0.0;
+                float elasticity = 0.8;
 
-    // 更新球的垂直速度和位置
-    velocity += gravity;
-    float newY = position.y + velocity;
+                // 更新球的垂直速度和位置
+                velocity += gravity;
+                float newY = position.y + velocity;
 
-    // 弹性碰撞
-    if (newY < -1.0) {
-      newY = -1.0;
-      velocity *= -elasticity;
-    }
+                // 弹性碰撞
+                if (newY < -1.0) {
+                newY = -1.0;
+                velocity *= -elasticity;
+                }
 
-    gl_Position = vec4(position.x, newY, 0.0, 1.0);
+                gl_Position = vec4(position.x, newY, 0.0, 1.0);
 
-    // 设置球的颜色
-    color = vec3(1.0, 0.0, 0.0); // 红色
-  }
-`;
+                // 设置球的颜色
+                color = vec3(1.0, 0.0, 0.0); // 红色
+            }
+            `;
 
         const fragmentShaderSource = `
-  // 片元着色器代码
-  precision mediump float;
-  varying vec3 color;
+            // 片元着色器代码
+            precision mediump float;
+            varying vec3 color;
 
-  void main() {
-    gl_FragColor = vec4(color, 1.0);
-  }
-`;
+            void main() {
+                gl_FragColor = vec4(color, 1.0);
+            }
+            `;
 
         // 创建着色器程序
         const shaderProgram = createShaderProgram(gl, vertexShaderSource, fragmentShaderSource);
