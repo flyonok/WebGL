@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Shared Vertex and Edge Mesh</title>
+</head>
+<body>
+    <canvas id="webgl-canvas" width="400" height="400"></canvas>
+
+    <script type="text/javascript">
+        const canvas = document.getElementById('webgl-canvas');
+        const gl = canvas.getContext('webgl');
+
+        // 顶点数据
+        const vertices = [
+            // 顶点位置和法线信息
+            // 格式: x, y, z, nx, ny, nz
+            -1.0, 1.0, 0.0, 0.0, 0.0, 1.0,
+            -1.0, -1.0, 0.0, 0.0, 0.0, 1.0,
+            1.0, -1.0, 0.0, 0.0, 0.0, 1.0,
+            1.0, 1.0, 0.0, 0.0, 0.0, 1.0,
+        ];
+
+        // 创建缓冲区并填充顶点数据
+        const vertexBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+
+        // 创建顶点着色器和片段着色器，并创建着色器程序
+        const vertexShaderSource = `
+            attribute vec3 aPosition;
+            attribute vec3 aNormal;
+            varying vec3 vNormal;
+            void main(void) {
+                gl_Position = vec4(aPosition, 1.0);
+                vNormal = aNormal;
+            }
+        `;
+
+        const fragmentShaderSource = `
+            precision mediump float;
+            varying vec3 vNormal;
+            void main(void) {
+                vec3 color = vec3(1.0, 0.5, 0.0); // 红色
+                gl_FragColor = vec4(color, 1.0);
+            }
+        `;
+
+        function createShaderProgram(gl, vertexShaderSource, fragmentShaderSource) {
+            // 创建顶点着色器和片段着色器
+            const vertexShader = gl.createShader(gl.VERTEX_SHADER);
+            gl.shaderSource(vertexShader, vertexShaderSource);
+            gl.compileShader(vertexShader);
+
+            const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+            gl.shaderSource(fragmentShader, fragmentShaderSource);
+            gl.compileShader(fragmentShader);
+
+            // 创建着色器程序
+            const shaderProgram = gl.createProgram();
+            gl.attachShader(shaderProgram, vertexShader);
+            gl.attachShader(shaderProgram, fragmentShader);
+            gl.linkProgram(shaderProgram);
+            gl.useProgram(shaderProgram);
+
+            return shaderProgram;
+        }
+
+        // 创建着色器程序并连接
+        const shaderProgram = createShaderProgram(gl, vertexShaderSource, fragmentShaderSource);
+        gl.useProgram(shaderProgram);
+
+        // 启用顶点属性
+        const positionAttribute = gl.getAttribLocation(shaderProgram, 'aPosition');
+        const normalAttribute = gl.getAttribLocation(shaderProgram, 'aNormal');
+
+        gl.enableVertexAttribArray(positionAttribute);
+        gl.enableVertexAttribArray(normalAttribute);
+
+        // 指定如何解释顶点数据
+        const stride = 6 * Float32Array.BYTES_PER_ELEMENT; // 每个顶点数据大小为 6 个浮点数
+        gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+        gl.vertexAttribPointer(positionAttribute, 3, gl.FLOAT, false, stride, 0);
+        gl.vertexAttribPointer(normalAttribute, 3, gl.FLOAT, false, stride, 3 * Float32Array.BYTES_PER_ELEMENT);
+
+        // 绘制多边形
+        gl.clearColor(0.0, 0.0, 0.0, 1.0);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        gl.drawArrays(gl.TRIANGLES, 0, vertices.length / 6);
+    </script>
+</body>
+</html>
