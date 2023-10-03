@@ -13,7 +13,7 @@ const board = [
     [2, 0, 2, 0, 2, 0, 2, 0],
 ];
 
-const tileSize = canvas.width / 16;
+const tileSize = canvas.width / 8;
 const canvasHalf = canvas.width / 2;
 let selectedTile = null;
 
@@ -83,8 +83,8 @@ function drawBoard() {
             const isDarkSquare = (row + col) % 2 === 0;
             const squareColor = isDarkSquare ? darkSquareColor : lightSquareColor;
 
-            const x = col * tileSize - canvasHalf / 2;
-            const y = (7 - row) * tileSize;
+            const x = col * tileSize - canvasHalf;
+            const y = (7 - row) * tileSize - canvasHalf;
 
             // 使用 WebGL 绘制正方形
             drawSquare(x, y, tileSize, squareColor);
@@ -128,15 +128,22 @@ function drawPieces() {
     // 在这里使用 WebGL 绘制棋子
     const radius = tileSize * 0.4 / canvasHalf;
     const pieceColor = [0.0, 0.0, 0.0, 1.0]; // 黑色棋子
+    const whiteColor = [1.0, 1.0, 1.0, 1.0]; // 白色
 
     for (let row = 0; row < 8; row++) {
         for (let col = 0; col < 8; col++) {
             if (board[row][col] === 1) {
-                const x = col * tileSize + tileSize / 2;
-                const y = (7 - row) * tileSize + tileSize / 2;
+                const x = col * tileSize + tileSize / 2 - canvasHalf;
+                const y = (7 - row) * tileSize + tileSize / 2 - canvasHalf;
 
                 // 使用 WebGL 绘制圆形棋子
-                drawCircle((x - canvasHalf / 2)/ canvasHalf, y / canvasHalf, radius, pieceColor);
+                drawCircle( x / canvasHalf, y / canvasHalf, radius, pieceColor);
+            }
+            else if (board[row][col] === 2){
+                const x = col * tileSize + tileSize / 2 - canvasHalf;
+                const y = (7 - row) * tileSize + tileSize / 2 - canvasHalf;
+                drawCircle( x/ canvasHalf, y / canvasHalf, radius, whiteColor);
+            
             }
         }
     }
