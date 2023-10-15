@@ -633,9 +633,9 @@ function mix( u, v, s )
 
     var result = [];
     for ( var i = 0; i < u.length; ++i ) {
-        let value = (1.0 - s) * u[i] + s * v[i] + Math.random() * (2*perturbation) + (-perturbation);
-        // result.push( (1.0 - s) * u[i] + s * v[i] );
-        result.push(value);
+        // let value = (1.0 - s) * u[i] + s * v[i] + Math.random() * (2*perturbation) + (-perturbation);
+        result.push( (1.0 - s) * u[i] + s * v[i] );
+        // result.push(value);
     }
 
     return result;

@@ -1,4 +1,10 @@
 <!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+    .div-section {
+        margin: 16px;
+    }
+</style>
 <html>
 
 <script id="vertex-shader" type="x-shader/x-vertex">
@@ -31,25 +37,27 @@ void main()
 <script type="text/javascript" src="cad1.js"></script>
 
 <body>
-<div>
-<canvas id="gl-canvas" width="512"" height="512">
-Oops ... your browser doesn't support the HTML5 canvas element
-</canvas>
-</div>
-<div>
-<select id = "mymenu" size = "7">
-    <option value = "0">Black</option>
-    <option value = "1">Red</option>
-    <option value = "2">Yellow</option>
-    <option value = "3">Green</option>
-    <option value = "4">Blue</option>
-    <option value = "5">Magenta</option>
-    <option value = "6">Cyan</option>
-</select>
+    <div>
+        <canvas id="gl-canvas" width="512"" height=" 512">
+            Oops ... your browser doesn't support the HTML5 canvas element
+        </canvas>
+    </div>
+    <div class="div-section">
+        <select id="mymenu" size="7">
+            <option value="0" style="background:black">Black</option>
+            <option value="1" style="background:red">Red</option>
+            <option value="2" style="background:yellow">Yellow</option>
+            <option value="3" style="background:green">Green</option>
+            <option value="4" style="background:blue">Blue</option>
+            <option value="5" style="background:magenta">Magenta</option>
+            <option value="6" style="background:cyan">Cyan</option>
+        </select>
 
-</div>
+    </div>
+    <div id="display-time" class="div-section"></div>
 
 
 
 </body>
+
 </html>
