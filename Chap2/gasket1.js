@@ -8,8 +8,9 @@ var NumPoints = 5000;
 window.onload = function init()
 {
     var canvas = document.getElementById( "gl-canvas" );
-
+    
     gl = WebGLUtils.setupWebGL( canvas );
+    
     if ( !gl ) { alert( "WebGL isn't available" ); }
 
     //
@@ -77,3 +78,4 @@ function render() {
     gl.clear( gl.COLOR_BUFFER_BIT );
     gl.drawArrays( gl.POINTS, 0, points.length );
 }
+
