@@ -20,21 +20,9 @@
 
   void main() {
     // 模拟重力效应
-    float gravity = -0.1;
-    float velocity = 0.0;
-    float elasticity = 0.8;
+   
 
-    // 更新球的垂直速度和位置
-    velocity += gravity;
-    float newY = position.y + velocity;
-
-    // 弹性碰撞
-    if (newY < -1.0) {
-      newY = -1.0;
-      velocity *= -elasticity;
-    }
-
-    gl_Position = vec4(position.x, newY, 0.0, 1.0);
+    gl_Position = vec4(position.x, position.y, 0.0, 1.0);
 
     // 设置球的颜色
     color = vec3(1.0, 0.0, 0.0); // 红色
@@ -100,7 +88,7 @@
             // 将时间传递给着色器
             gl.uniform1f(timeUniformLocation, performance.now() / 1000);
 
-            // 顶点数据
+            // 三角形顶点数据
             const vertices = new Float32Array([-0.1, ballY, 0.1, ballY, 0.0, ballY + 0.1]);
 
             gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);

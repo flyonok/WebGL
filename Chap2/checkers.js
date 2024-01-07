@@ -15,7 +15,8 @@ const board = [
 ];
 
 const tileSize = canvas.width / 8;
-const canvasHalf = canvas.width / 2;
+const canvasWidthHalf = canvas.width/ 2;
+const canvasHalfHeight = canvas.height / 2;
 let selectedTile = null;
 
 // 初始化着色器和缓冲区
@@ -100,11 +101,11 @@ function drawBoard() {
 
             // const x = col * tileSize - canvasHalf;
             // const y = (7 - row) * tileSize - canvasHalf;
-            const x = col * tileSize - canvasHalf;
-            const y = (7 - row) * tileSize;
+            const x = (col * tileSize)/canvasWidthHalf  - 1;
+            const y = ((7 - row) * tileSize)/canvasHalfHeight - 1;
 
             // 使用 WebGL 绘制正方形
-            drawSquare(x, y, tileSize, squareColor);
+            drawSquare(x, y, tileSize/canvasWidthHalf, squareColor);
         }
     }
 }
@@ -156,14 +157,14 @@ function drawPieces() {
 
                 // // 使用 WebGL 绘制圆形棋子
                 // drawCircle( x / canvasHalf, y / canvasHalf, radius, pieceColor);
-                const x = col * tileSize + tileSize / 2 ;
-                const y = (7 - row) * tileSize + tileSize / 2;
+                const x = (col * tileSize + tileSize / 2 ) / canvasWidthHalf  - 1;
+                const y = ((7 - row) * tileSize + tileSize / 2)/ canvasHalfHeight - 1;
 
                 // 使用 WebGL 绘制圆形棋子
-                drawCircle( x , y, radius, pieceColor);
+                drawCircle( x, y, radius/canvasWidthHalf, pieceColor);
                 // 添加棋子的唯一标识
-                let x1 = (x/canvasHalf);
-                let y1 = (y/canvasHalf)
+                let x1 = x;
+                let y1 = y;
                 const piece = { row, col, x1, y1, radius };
                 pieces.push(piece);
             }
@@ -171,12 +172,12 @@ function drawPieces() {
                 // const x = col * tileSize + tileSize / 2 - canvasHalf;
                 // const y = (7 - row) * tileSize + tileSize / 2 - canvasHalf;
                 // drawCircle( x/ canvasHalf, y / canvasHalf, radius, whiteColor);
-                const x = col * tileSize + tileSize / 2;
-                const y = (7 - row) * tileSize + tileSize / 2;
-                drawCircle( x, y , radius, whiteColor);
+                const x = (col * tileSize + tileSize / 2 ) / canvasWidthHalf  - 1;
+                const y = ((7 - row) * tileSize + tileSize / 2)/ canvasHalfHeight - 1;
+                drawCircle( x, y, radius/canvasWidthHalf, whiteColor);
                 // 添加棋子的唯一标识
-                let x1 = (x/canvasHalf);
-                let y1 = (y/canvasHalf)
+                let x1 = x;
+                let y1 = y;
                 const piece = { row, col, x1, y1, radius };
                 pieces.push(piece);
             
@@ -190,8 +191,8 @@ canvas.addEventListener("mousedown", pickPiece);
 
 // 鼠标事件处理函数
 function pickPiece(event) {
-    const mouseX = (event.clientX - canvas.getBoundingClientRect().left - canvasHalf)/canvasHalf;
-    const mouseY = (event.clientY - canvas.getBoundingClientRect().top - canvasHalf)/canvasHalf;
+    const mouseX = (event.clientX - canvas.getBoundingClientRect().left - canvasWidthHalf)/canvasWidthHalf;
+    const mouseY = (event.clientY - canvas.getBoundingClientRect().top - canvasWidthHalf)/canvasWidthHalf;
 
     for (const piece of pieces) {
         const distance = Math.sqrt(
